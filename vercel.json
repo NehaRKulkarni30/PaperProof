@@ -19,9 +19,22 @@
       }
     },
     {
-      "source": "/(.*)",
+      "source": "/assets/:path*",
       "destination": {
         "service": "frontend"
+      }
+    },
+    {
+      "source": "/logo.svg",
+      "destination": {
+        "service": "frontend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
       }
     }
   ]
