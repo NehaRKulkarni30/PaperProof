@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --plum-900: #3B1730;
+  --plum-800: #4A1F3F;
+  --burgundy: #5A1538;
+  --cream-50: #FBF3EC;
+  --cream-100: #F5EBDD;
+  --sand-200: #E8D9C3;
+  --gold: #C9A06A;
+  --amber: #B8862B;
+  --ink: #2A1424;
+
+  --verdict-supported: #3B7D3A;
+  --verdict-partly: #B8741A;
+  --verdict-unsupported: #A63030;
+  --verdict-missing: #5A5A5A;
+  --verdict-contradictory: #5B4FC4;
+  --verdict-outdated: #2E9E7E;
+}
+
+@layer base {
+  body {
+    background-color: var(--cream-50);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    background-image:
+      radial-gradient(rgba(90, 21, 56, 0.03) 1px, transparent 0),
+      radial-gradient(rgba(201, 160, 106, 0.04) 1px, transparent 0);
+    background-size: 32px 32px;
+    background-position: 0 0, 16px 16px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  .label-caps {
+    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-burgundy px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-cream-50 shadow-card transition-all duration-200 hover:bg-burgundy-dark hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-plum-950 shadow-card transition-all duration-200 hover:bg-gold-light hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-burgundy/40 bg-transparent px-5 py-2.5 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-burgundy transition-all duration-200 hover:bg-burgundy/5 hover:border-burgundy disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-outline-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-cream-100/35 bg-white/5 px-5 py-2.5 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-cream-50 transition-all duration-200 hover:bg-white/15 hover:border-gold;
+  }
+
+  .journal-card {
+    @apply rounded-2xl border border-sand-300/70 bg-cream-100/90 shadow-journal backdrop-blur-sm;
+  }
+
+  .paper-texture {
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(232, 217, 195, 0.25) 100%);
+  }
+
+  .plum-hero {
+    background: radial-gradient(circle at 18% 15%, rgba(201, 160, 106, 0.14), transparent 45%),
+                radial-gradient(circle at 82% 80%, rgba(90, 21, 56, 0.65), transparent 55%),
+                linear-gradient(135deg, #3B1730 0%, #4A1F3F 52%, #2F1026 100%);
+  }
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F5EBDD;
+}
+::-webkit-scrollbar-thumb {
+  background: #C9A06A88;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5A153888;
+}
+
+/* Animated dashed border for drag-and-drop */
+@keyframes dash-march {
+  to {
+    background-position: 100% 0, 0 100%, 0 0, 100% 100%;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(0%);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(155px);
+    opacity: 0.2;
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 2.2s ease-in-out infinite alternate;
+}
+
+/* Print / Save PDF Stylesheet */
+@media print {
+  @page {
+    margin: 14mm;
+    size: A4;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    background-image: none !important;
+    color: #1A1018 !important;
+    font-size: 11pt !important;
+  }
+
+  .no-print,
+  nav,
+  footer button,
+  .review-controls-bar,
+  .filter-bar {
+    display: none !important;
+  }
+
+  .print-header {
+    background: #3B1730 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color: #FBF3EC !important;
+    padding: 18px !important;
+    border-radius: 10px !important;
+  }
+
+  .print-break-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-grid-single {
+    display: block !important;
+  }
+}

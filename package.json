@@ -1,0 +1,13 @@
+{
+  "name": "paperproof",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PaperProof (CiteVerify) — Scientific Claim and Citation Verification System (INNOVEDGE Hackathon 2026)",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "cd backend && .\\.venv\\Scripts\\uvicorn app.main:app --port 8000",
+    "build:frontend": "npm --prefix frontend run build",
+    "test:backend": "cd backend && .\\.venv\\Scripts\\pytest -v",
+    "dev": "node -e \"const path=require('path'); const {spawn}=require('child_process'); const py=path.resolve('backend', process.platform==='win32'?'.venv/Scripts/uvicorn.exe':'.venv/bin/uvicorn'); const b=spawn(py,['app.main:app','--port','8000'],{cwd:'backend',stdio:'inherit'}); const f=spawn(process.platform==='win32'?'npm.cmd':'npm',['run','dev'],{cwd:'frontend',stdio:'inherit'}); process.on('SIGINT',()=>{b.kill();f.kill();process.exit();});\""
+  }
+}
