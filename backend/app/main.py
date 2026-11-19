@@ -48,6 +48,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+# Ensure tables are initialized even in serverless environments where ASGI lifespan may be deferred
+Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,

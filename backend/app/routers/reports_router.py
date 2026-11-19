@@ -1,4 +1,5 @@
 import json
+import os
 import secrets
 import time
 from collections import defaultdict
@@ -223,7 +224,12 @@ async def verify_document(
     db.commit()
     db.refresh(report)
 
-    background_tasks.add_task(run_verification_pipeline, report.id, pages, False)
+    if os.environ.get("VERCEL"):
+        # On serverless runtimes, execute before returning so the function isn't frozen mid-pipeline
+        await run_verification_pipeline(report.id, pages, False)
+        db.refresh(report)
+    else:
+        background_tasks.add_task(run_verification_pipeline, report.id, pages, False)
     return {
         "id": report.id,
         "short_id": report.id[:8].upper(),
@@ -256,7 +262,11 @@ async def run_sample_document(
     db.commit()
     db.refresh(report)
 
-    background_tasks.add_task(run_verification_pipeline, report.id, pages, True)
+    if os.environ.get("VERCEL"):
+        await run_verification_pipeline(report.id, pages, True)
+        db.refresh(report)
+    else:
+        background_tasks.add_task(run_verification_pipeline, report.id, pages, True)
     return {
         "id": report.id,
         "short_id": report.id[:8].upper(),
@@ -359,7 +369,7 @@ def delete_report(
 
 
 @router.post("/reports/{report_id}/rerun", status_code=status.HTTP_202_ACCEPTED)
-def rerun_report(
+async def rerun_report(
     report_id: str,
     background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
@@ -389,8 +399,12 @@ def rerun_report(
     db.commit()
     db.refresh(new_report)
 
-    background_tasks.add_task(run_verification_pipeline, new_report.id, pages, old.is_sample)
-    return {"id": new_report.id, "short_id": new_report.id[:8].upper(), "status": "processing"}
+    if os.environ.get("VERCEL"):
+        await run_verification_pipeline(new_report.id, pages, old.is_sample)
+        db.refresh(new_report)
+    else:
+        background_tasks.add_task(run_verification_pipeline, new_report.id, pages, old.is_sample)
+    return {"id": new_report.id, "short_id": new_report.id[:8].upper(), "status": new_report.status}
 
 
 @router.patch("/reports/{report_id}/claims/{claim_id}/review", response_model=ReviewDecisionOut)

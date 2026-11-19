@@ -1,16 +1,22 @@
+import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.config import get_settings
 
 settings = get_settings()
 
+# Vercel serverless filesystem is read-only outside /tmp; switch default relative SQLite path to /tmp automatically
+db_url = settings.database_url
+if os.environ.get("VERCEL") and db_url.startswith("sqlite:///./"):
+    db_url = "sqlite:////tmp/paperproof.db"
+
 connect_args = {}
-if settings.database_url.startswith("sqlite"):
+if db_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False, "timeout": 30}
 
-engine = create_engine(settings.database_url, connect_args=connect_args)
+engine = create_engine(db_url, connect_args=connect_args)
 
-if settings.database_url.startswith("sqlite"):
+if db_url.startswith("sqlite"):
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
