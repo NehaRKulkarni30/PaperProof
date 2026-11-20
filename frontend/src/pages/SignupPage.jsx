@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, User, Sparkles } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
 import { api } from "../api/client";
 import { DocumentMedalIllustration } from "../components/Illustrations";
 
 export default function SignupPage() {
-  const { signup } = useAuth();
+  const { signup, demoLogin } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -19,7 +19,22 @@ export default function SignupPage() {
   const [showPw, setShowPw] = useState(false);
   const [agree, setAgree] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleDemoLogin = async () => {
+    setError("");
+    setDemoLoading(true);
+    try {
+      await demoLogin();
+      toast("Signed in as Demo Reviewer — no credentials needed!", "success");
+      navigate("/verify", { replace: true });
+    } catch (err) {
+      setError(err.message || "Unable to start demo session.");
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -199,19 +214,35 @@ export default function SignupPage() {
           <div className="h-px flex-1 bg-sand-300" />
         </div>
 
-        <button
-          type="button"
-          onClick={handleGoogleClick}
-          className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-sand-300 bg-cream-50 px-4 py-2.5 font-sans text-xs font-semibold text-ink shadow-sm hover:bg-white hover:border-burgundy/40 transition-colors"
-        >
-          <svg className="h-4 w-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" />
-            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z" />
-            <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z" />
-            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z" />
-          </svg>
-          Sign up with Google
-        </button>
+        <div className="space-y-2.5">
+          <button
+            type="button"
+            disabled={demoLoading || submitting}
+            onClick={handleDemoLogin}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold-amber/50 bg-gold/20 px-4 py-2.5 font-sans text-xs font-semibold text-plum-900 shadow-sm hover:bg-gold/35 transition-colors disabled:opacity-50"
+          >
+            {demoLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4 text-burgundy" />
+            )}
+            Demo Login (No Sign-Up Needed)
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGoogleClick}
+            className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-sand-300 bg-cream-50 px-4 py-2.5 font-sans text-xs font-semibold text-ink shadow-sm hover:bg-white hover:border-burgundy/40 transition-colors"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" />
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z" />
+              <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z" />
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z" />
+            </svg>
+            Sign up with Google
+          </button>
+        </div>
 
         <p className="mt-6 text-center font-sans text-xs text-ink-muted">
           Already have an account?{" "}

@@ -90,6 +90,24 @@ def test_auth_signup_login_me_and_protected_routes(client_and_db):
     assert me.json()["email"] == "alice@university.edu"
 
 
+def test_demo_login_works_idempotently(client_and_db):
+    client, _ = client_and_db
+    r1 = client.post("/api/auth/demo")
+    assert r1.status_code == 200
+    body1 = r1.json()
+    assert body1["user"]["email"] == "demo@paperproof.app"
+    assert body1["access_token"]
+
+    # Calling demo login again reuses the same demo user cleanly
+    r2 = client.post("/api/auth/demo")
+    assert r2.status_code == 200
+    assert r2.json()["user"]["id"] == body1["user"]["id"]
+
+    me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {body1['access_token']}"})
+    assert me.status_code == 200
+    assert me.json()["name"] == "Demo Reviewer"
+
+
 def test_verify_input_validation(client_and_db):
     client, _ = client_and_db
     token = _signup(client, "Bob", "bob@university.edu")

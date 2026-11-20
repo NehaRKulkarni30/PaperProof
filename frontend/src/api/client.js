@@ -54,6 +54,7 @@ export const api = {
   health: () => apiFetch("/health"),
   signup: (payload) => apiFetch("/auth/signup", { method: "POST", body: JSON.stringify(payload) }),
   login: (payload) => apiFetch("/auth/login", { method: "POST", body: JSON.stringify(payload) }),
+  demoLogin: () => apiFetch("/auth/demo", { method: "POST" }),
   me: () => apiFetch("/auth/me"),
   googleAuth: (credential) =>
     apiFetch("/auth/google", { method: "POST", body: JSON.stringify({ credential }) }),

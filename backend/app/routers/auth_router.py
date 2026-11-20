@@ -1,3 +1,5 @@
+import secrets
+
 from fastapi import APIRouter, Depends, HTTPException, status
 import httpx
 from sqlalchemy.orm import Session
@@ -61,6 +63,25 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return _user_to_out(current_user)
+
+
+@router.post("/demo", response_model=AuthResponse)
+def demo_login(db: Session = Depends(get_db)):
+    """One-click demo reviewer login (no credentials required)."""
+    demo_email = "demo@paperproof.app"
+    user = db.query(User).filter(User.email == demo_email).first()
+    if not user:
+        user = User(
+            name="Demo Reviewer",
+            email=demo_email,
+            password_hash=hash_password(secrets.token_urlsafe(24)),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    token = create_access_token(user.id, remember_me=True)
+    return AuthResponse(access_token=token, user=_user_to_out(user))
 
 
 @router.post("/google", response_model=AuthResponse)
