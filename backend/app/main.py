@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.database import Base, SessionLocal, engine
+from app.database import Base, SessionLocal, engine, is_sqlite
 from app.models import Report
 from app.pipeline.llm import gemini_client
 from app.routers import auth_router, reports_router, shared_router
@@ -69,6 +69,7 @@ def health_check():
     return {
         "status": "ok",
         "service": "PaperProof",
+        "database_backend": "sqlite" if is_sqlite else "postgresql",
         "gemini_configured": gemini_client.is_configured,
         "gemini_model": gemini_client._model_name if gemini_client.is_configured else None,
         "google_oauth_configured": bool(settings.google_client_id),

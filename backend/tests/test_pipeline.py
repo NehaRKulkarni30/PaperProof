@@ -10,6 +10,7 @@ from docx import Document
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from app.database import resolve_database_url
 from app.pipeline.claims import (
     expand_numeric_markers,
     extract_markers_from_text,
@@ -313,3 +314,19 @@ def test_find_best_matching_reference_for_bibliography_at_end_reports():
         found_map,
     )
     assert idx == 0
+
+
+def test_resolve_database_url_handles_vercel_postgres_and_sqlite():
+    # Local default stays SQLite
+    assert resolve_database_url("sqlite:///./paperproof.db", env={}) == "sqlite:///./paperproof.db"
+    # Vercel without Postgres falls back to writable /tmp SQLite
+    assert resolve_database_url("sqlite:///./paperproof.db", env={"VERCEL": "1"}) == "sqlite:////tmp/paperproof.db"
+    # Vercel with Neon POSTGRES_URL normalizes to psycopg v3
+    pg = resolve_database_url(
+        "sqlite:///./paperproof.db",
+        env={"VERCEL": "1", "POSTGRES_URL": "postgres://user:pass@ep-cool.neon.tech/neondb?sslmode=require&pgbouncer=true"},
+    )
+    assert pg == "postgresql+psycopg://user:pass@ep-cool.neon.tech/neondb?sslmode=require"
+    # Explicit postgresql:// DATABASE_URL normalizes cleanly
+    pg2 = resolve_database_url("postgresql://u:p@host:5432/mydb", env={})
+    assert pg2 == "postgresql+psycopg://u:p@host:5432/mydb"
