@@ -151,7 +151,7 @@ export function ReportView({ report, readOnly = false, onRefresh }) {
 
   const shareUrl =
     shareState.is_public && shareState.share_token
-      ? `${window.location.origin}/shared/${shareState.share_token}`
+      ? `${window.location.origin}/#/shared/${shareState.share_token}`
       : "";
 
   const copyShareUrl = () => {
